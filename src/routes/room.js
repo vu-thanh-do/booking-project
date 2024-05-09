@@ -8,6 +8,10 @@ router.delete("/delete-room/:id", roomController.removeRoom);
 router.post("/create-room", roomController.createRoom);
 router.put("/edit-room/:id", roomController.editRoom);
 router.post("/evaluate-room/:id", roomController.evaluateRoom);
+router.post("/remove-evaluate-room/:id", roomController.removeEvaluateRoom);
+router.post("/edit-evaluate-room/:id", roomController.editEvaluateRoom);
+
+
 
 
 

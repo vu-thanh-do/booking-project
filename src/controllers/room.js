@@ -1,4 +1,5 @@
 import Room from "../models/room.js";
+import Order from "../models/order.js";
 
 export const roomController = {
   createRoom: async (req, res) => {
@@ -24,8 +25,33 @@ export const roomController = {
   },
   getALlRoom: async (req, res) => {
     try {
-      const data = await Room.find({ active: "Active" }).select("-evaluate");
-      return res.status(200).json({ message: "ok", data: data });
+      const searchRoom = req.body;
+      if (searchRoom.search) {
+
+        const dataSearch = await Order.find({
+          $or: [
+            {
+              startDate: {
+                $gte: searchRoom.startDate,
+                $lte: searchRoom.endDate,
+              },
+            },
+            {
+              endDate: { $gte: searchRoom.startDate, $lte: searchRoom.endDate },
+            },
+          ],
+        });
+        var bookedRoomIds = dataSearch.map(function (booking) {
+          return booking._id;
+        });
+        var availableRoomsFiltered = availableRooms.filter(function (room) {
+          return !bookedRoomIds.includes(room._id);
+        });
+        console.log(dataSearch);
+      } else {
+        const data = await Room.find({ active: "Active" }).select("-evaluate");
+        return res.status(200).json({ message: "ok", data: data });
+      }
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
@@ -91,18 +117,54 @@ export const roomController = {
       if (Number(evaluateData.star > 5 || evaluateData.star < 1)) {
         return res.status(500).json({ message: "min star 1 max 5  " });
       }
-      if(!evaluateData.idUser){
+      if (!evaluateData.idUser) {
         return res.status(500).json({ message: "idUser is requird" });
       }
       if (!data) return res.status(404).json({ message: "not found" });
       data.evaluate.push({
         star: Number(evaluateData.star),
-        idUser : evaluateData.idUser,
+        idUser: evaluateData.idUser,
         content: evaluateData.content,
-        image : evaluateData.image
+        image: evaluateData.image,
       });
       await data.save();
       return res.status(201).json({
+        message: "ok",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  removeEvaluateRoom: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = await Room.findById(id);
+      const { idEvalue } = req.query;
+      if (!data) return res.status(404).json({ message: "not found" });
+      const index = data.evaluate.findIndex((db) => db._id == idEvalue);
+      data.evaluate.splice(index);
+      await data.save();
+      return res.status(200).json({
+        message: "ok",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  editEvaluateRoom: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = await Room.findById(id);
+      const { idEvalue, content, star, image } = req.body;
+      if (!data) return res.status(404).json({ message: "not found" });
+      const index = data.evaluate.findIndex((db) => db._id == idEvalue);
+      (data.evaluate[index].content = content),
+        (data.evaluate[index].star = star),
+        (data.evaluate[index].image = image),
+        await data.save();
+      return res.status(200).json({
         message: "ok",
         data: data,
       });

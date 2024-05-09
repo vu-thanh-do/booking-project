@@ -35,7 +35,7 @@ const orderSchema = new mongoose.Schema(
     },
     typePayment: {
       type: String,
-      enum: ["VNPAY", "CASH"],
+      enum: ["VNPAY", "CASH","EMPTY"],
       require: true,
     },
     price: Number,
@@ -50,6 +50,6 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
-userSchema.plugin(mongoosePaginate);
+orderSchema.plugin(mongoosePaginate);
 
 export default mongoose.model("Order", orderSchema);
