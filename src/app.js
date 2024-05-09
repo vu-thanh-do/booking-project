@@ -1,6 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import authRouter from "./routes/auth.js";
+import userRouter from "./routes/user.js";
+import roomRouter from "./routes/room.js";
+
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -13,8 +16,10 @@ app.use(express.json());
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-
 app.use("/api", authRouter);
+app.use("/api", userRouter);
+app.use("/api", roomRouter);
+
 mongoose.connect(process.env.URI);
 app.get("/", async (req, res) => {
   res.json("success");
