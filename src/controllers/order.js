@@ -1,5 +1,7 @@
 import Order from "../models/order.js";
 import Room from "../models/room.js";
+import User from "../models/user.js";
+import { sendEmail } from "../service/sendMail.js";
 
 export const orderController = {
   createOrder: async (req, res) => {
@@ -10,7 +12,9 @@ export const orderController = {
           message: "Invalid",
         });
       }
+    
       const data = req.body;
+      const userData = await User.findById(data.userId);
       const newOrder = await Order.create({
         userId: data.userId,
         price: data.price,
@@ -30,6 +34,24 @@ export const orderController = {
           endDate: data.endDate,
         },
       });
+      const dataMailer = {
+        to: userData.email,
+        text: 'Thông tin quan trọng !',
+        subject: 'Đặt phòng thành công',
+        html: `<html>
+        <body>
+        <div>
+          <h2>Hệ thống đặt phòng thông báo : </h2>
+          <div>Chúc mừng bạn đã đặt phòng  :  ${dataRoom.name} thành công </div>
+          <div>Giá phòng là   :  ${data.price?.toLocaleString()} VNĐ </div>
+          <p> <span style="color:black; font-weight: bold">Đây là mail tự động vui lòng không phản hồi ! </span> </p>
+        </div>
+        <div>
+        </div>
+      </body>
+        </html>`,
+      };
+      await sendEmail(dataMailer);
       return res.status(201).json({
         message: "ok",
         data: newOrder,

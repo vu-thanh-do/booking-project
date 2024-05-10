@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import http from "http";
+import { sendEmail } from "./service/sendMail.js";
 dotenv.config();
 // khởi tạo
 const app = express();
@@ -26,6 +27,7 @@ mongoose.connect(process.env.URI);
 app.get("/", async (req, res) => {
   res.json("success");
 });
+
 server.listen(process.env.PORT, (req, res) => {
   try {
     console.log(`Server is running on port ${process.env.PORT} `);
