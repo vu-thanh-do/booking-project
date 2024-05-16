@@ -41,7 +41,7 @@ const orderSchema = new mongoose.Schema(
     price: Number,
     status: {
       type: String,
-      enum: ["PAYED", "PENDING", "COMPLETED", "DEPOSIT"],
+      enum: ["PAYED", "PENDING", "COMPLETED", "DEPOSIT","CANCELED"],
       require: true,
     },
     noteBooking: {

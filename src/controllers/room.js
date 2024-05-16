@@ -1,5 +1,6 @@
 import Room from "../models/room.js";
 import Order from "../models/order.js";
+import dateOrder from "../models/dateOrder.js";
 
 export const roomController = {
   createRoom: async (req, res) => {
@@ -27,7 +28,6 @@ export const roomController = {
     try {
       const searchRoom = req.body;
       if (searchRoom.search) {
-
         const dataSearch = await Order.find({
           $or: [
             {
@@ -59,8 +59,9 @@ export const roomController = {
   getIdRoom: async (req, res) => {
     try {
       const data = await Room.findById(req.params.id);
+      const dateBooked = await dateOrder.find({ idRoom: req.params.id });
       if (!data) return res.status(404).json({ message: "not found" });
-      return res.status(200).json({ message: "ok", data: data });
+      return res.status(200).json({ message: "ok", data: data, booked: dateBooked });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }

@@ -1,3 +1,4 @@
+import dateOrder from "../models/dateOrder.js";
 import Order from "../models/order.js";
 import Room from "../models/room.js";
 import User from "../models/user.js";
@@ -14,6 +15,7 @@ export const orderController = {
       }
     
       const data = req.body;
+      console.log(data);
       const userData = await User.findById(data.userId);
       const newOrder = await Order.create({
         userId: data.userId,
@@ -29,9 +31,9 @@ export const orderController = {
           piceRoom: dataRoom.price,
           typeRoom: dataRoom.type,
           countPeople: dataRoom.countPeople,
-          people: data.people,
-          startDate: data.startDate,
-          endDate: data.endDate,
+          people: data.room.people,
+          startDate: data.room.startDate,
+          endDate: data.room.endDate,
         },
       });
       const dataMailer = {
@@ -111,6 +113,14 @@ export const orderController = {
       (data.status = bodyData.status),
         (data.typePayment = bodyData.typePayment);
       await data.save();
+      if(bodyData.status != "CANCELED" && bodyData.status != "PENDING"){
+        await dateOrder.create({
+          endDate : data.room.endDate,
+          startDate : data.room.startDate,
+          iduser : data.userId,
+          idRoom : data.room.idRoom
+        })
+      }
       return res.status(200).json({ message: "ok", data });
     } catch (error) {
       return res.status(500).json({ message: error.message });
