@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/user.js";
 
 export const userController = {
@@ -54,28 +55,32 @@ export const userController = {
   },
   // register
   updateUser: async (req, res) => {
-    // const { _id } = req.user;
-    // check id
+    const { name, email, role } = req.body;
+    console.log(req.params.id);
+    console.log("Request Body:", req.body);
+    console.log("Request Params ID:", req.params.id);
+    if (!name || !email || !role) {
+      return res
+        .status(400)
+        .json({ message: "Name, email, and role are required." });
+    }
     try {
-      const result = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-      });
+      const result = await User.findByIdAndUpdate(
+        req.params.id,
+        { name, email, role },
+        { new: true, runValidators: true }
+      );
+
       if (!result) {
-        return res
-          .status(404)
-          .json({ message: "Không tìm thấy thông tin người dùng" });
+        return res.status(404).json({ message: "User not found." });
       }
-      /* update slug */
-      const slug = slugify(result.username, { lower: true });
-      result.slug = slug;
-      /* loại bỏ slug */
-      // result.password = undefined;
-      res.json({
-        message: "update success",
+
+      return res.status(200).json({
+        message: "Update success",
         user: result,
       });
     } catch (error) {
-      throw new Error(error);
+      return res.json({ message: error.message });
     }
   },
   updateInfor: async (req, res, next) => {
@@ -172,10 +177,8 @@ export const userController = {
   },
 
   deleteUser: async (req, res) => {
-    // const { _id } = req.user;
     try {
       const userDelete = await User.findByIdAndDelete(req.params.id);
-      // await Role.findByIdAndUpdate(userDelete.role, { $pull: { users: userDelete._id } });
       res.json({
         message: "User deleted successfully",
         user: userDelete,
