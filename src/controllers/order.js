@@ -109,17 +109,35 @@ export const orderController = {
       const { id } = req.params;
       const bodyData = req.body;
       const data = await Order.findById(id);
+      const dataUser = await User.findById(data.userId);
       if (!data) return res.status(404).json({ message: "Invalid order" });
       (data.status = bodyData.status),
         (data.typePayment = bodyData.typePayment);
       await data.save();
-      if(bodyData.status != "CANCELED" && bodyData.status != "PENDING"){
+      if (bodyData.status != "CANCELED" && bodyData.status != "PENDING") {
         await dateOrder.create({
-          endDate : data.room.endDate,
-          startDate : data.room.startDate,
-          iduser : data.userId,
-          idRoom : data.room.idRoom
-        })
+          endDate: data.room.endDate,
+          startDate: data.room.startDate,
+          iduser: data.userId,
+          idRoom: data.room.idRoom,
+        });
+        const dataMailer = {
+          to: dataUser.email,
+          text: "Thông tin quan trọng !",
+          subject: " Thanh toán thành công",
+          html: `<html>
+        <body>
+        <div>
+          <h2>Hệ thống đặt phòng thông báo : </h2>
+          <div>Chúc mừng bạn đã Thanh toán  thành công </div>
+          <p> <span style="color:black; font-weight: bold">Đây là mail tự động vui lòng không phản hồi ! </span> </p>
+        </div>
+        <div>
+        </div>
+      </body>
+        </html>`,
+        };
+        await sendEmail(dataMailer);
       }
       return res.status(200).json({ message: "ok", data });
     } catch (error) {

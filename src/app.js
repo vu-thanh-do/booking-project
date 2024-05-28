@@ -10,6 +10,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { sendEmail } from "./service/sendMail.js";
+
 dotenv.config();
 // khởi tạo
 const app = express();

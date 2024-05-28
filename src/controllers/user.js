@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import User from "../models/user.js";
+import Order from "../models/order.js";
 
 export const userController = {
   // get all
@@ -179,6 +180,7 @@ export const userController = {
   deleteUser: async (req, res) => {
     try {
       const userDelete = await User.findByIdAndDelete(req.params.id);
+      await Order.deleteMany({ userId: req.params.id });
       res.json({
         message: "User deleted successfully",
         user: userDelete,
