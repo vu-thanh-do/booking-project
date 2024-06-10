@@ -4,7 +4,7 @@ import authRouter from "./routes/auth.js";
 import userRouter from "./routes/user.js";
 import roomRouter from "./routes/room.js";
 import orderRouter from "./routes/order.js";
-
+import analyticRouter from "./routes/analytics.js";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -23,6 +23,7 @@ app.use("/api", authRouter);
 app.use("/api", userRouter);
 app.use("/api", roomRouter);
 app.use("/api", orderRouter);
+app.use("/api", analyticRouter);
 
 mongoose.connect(process.env.URI);
 app.get("/", async (req, res) => {
