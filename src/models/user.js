@@ -16,12 +16,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "member",
     },
-    order: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Order",
-      },
-    ],
   },
   { timestamps: true, versionKey: false }
 );
